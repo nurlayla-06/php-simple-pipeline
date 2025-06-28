@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        docker { image 'php:8.1-cli' }
+    }
 
     stages {
         stage('Clone Repository') {
@@ -10,13 +12,16 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'composer install'
+                sh '''
+                    curl -sS https://getcomposer.org/installer | php
+                    php composer.phar install
+                '''
             }
         }
 
         stage('Unit Test') {
             steps {
-                sh './vendor/bin/phpunit tests'
+                sh 'php vendor/bin/phpunit tests'
             }
             post {
                 success {
